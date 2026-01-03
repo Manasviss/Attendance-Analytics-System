@@ -17,7 +17,7 @@ const StudentStatsModal = ({ student, onClose }) => {
         try {
             const token = localStorage.getItem('token');
             // Fetch attendance history for this student
-            const response = await fetch(`http://localhost:5000/api/attendance/${student._id}`, {
+            const response = await fetch(`/api/attendance/${student._id}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();

@@ -1,4 +1,5 @@
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -19,7 +20,12 @@ export default {
           DEFAULT: '#003087', // PayPal Dark Blue
           light: '#009cde',   // PayPal Light Blue
           dark: '#001c64',
+          'deep-blue': '#050A18', // Deep Night Blue
         },
+        'bg-primary': 'rgb(var(--bg-primary) / <alpha-value>)',
+        'bg-secondary': 'rgb(var(--bg-secondary) / <alpha-value>)',
+        'text-primary': 'rgb(var(--text-primary) / <alpha-value>)',
+        'text-secondary': 'rgb(var(--text-secondary) / <alpha-value>)',
         accent: {
           DEFAULT: '#8B5CF6',
           light: '#A78BFA',

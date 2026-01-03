@@ -3,6 +3,50 @@
 @import 'tailwindcss/utilities';
 
 /* Your custom styles below */
+@layer base {
+  :root {
+    --bg-primary: 255 255 255;
+    --bg-secondary: 249 250 251;
+    /* gray-50 */
+    --text-primary: 17 24 39;
+    /* gray-900 */
+    --text-secondary: 75 85 99;
+    /* gray-600 */
+  }
+
+  .dark {
+    --bg-primary: 253 246 227;
+    /* #fdf6e3 Solarized Base3 (Cream Background) */
+    --bg-secondary: 238 232 213;
+    /* #eee8d5 Solarized Base2 (Card/Sidebar Background) */
+    --bg-input: 255 255 255;
+    /* Pure White for Inputs */
+    --text-primary: 67 76 94;
+    /* #434c5e Nord Polar Night (Main Text) */
+    --text-secondary: 101 123 131;
+    /* #657b83 Solarized Content (Muted Text) */
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-[#002E6E] dark:bg-gray-500 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-blue-700 dark:bg-gray-400;
+  }
+
+  body {
+    @apply text-text-primary bg-bg-primary transition-colors duration-200;
+  }
+}
 
 /* Custom animations */
 @keyframes gradient-xy {

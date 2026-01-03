@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+*.exe
+*.log
+.DS_Store
+db-data
+mongobin
+.git

@@ -6,6 +6,21 @@ const { protect } = require('../middleware/auth');
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
+// @desc    Get all teachers
+// @route   GET /api/auth/teachers
+// @access  Private (Admin only ideally, but keeping simple for now)
+router.get('/teachers', protect, async (req, res) => {
+    try {
+        const teachers = await User.find({ role: 'teacher' });
+        res.status(200).json({
+            success: true,
+            data: teachers
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // @desc    Get current logged in user
 // @route   GET /api/auth/me
 // @access  Private

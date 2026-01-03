@@ -15,7 +15,7 @@ const LeaveRequests = () => {
     const fetchLeaves = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/leaves', {
+            const response = await fetch('/api/leaves', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -32,7 +32,7 @@ const LeaveRequests = () => {
     const handleStatusUpdate = async (id, status) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/leaves/${id}/status`, {
+            const response = await fetch(`/api/leaves/${id}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -52,7 +52,7 @@ const LeaveRequests = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-bg-secondary dark:bg-bg-primary flex">
             <Sidebar activeTab="leave-requests" />
 
             <main className="flex-1 ml-64 p-8">
@@ -80,8 +80,10 @@ const LeaveRequests = () => {
                                     ) : leaves.map((leave) => (
                                         <tr key={leave._id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4">
-                                                <div className="font-medium text-gray-900">{leave.teacher?.name || leave.student?.name || 'Unknown'}</div>
-                                                <div className="text-xs text-gray-500">{leave.teacher?.uid || leave.student?.rollNumber}</div>
+                                                <div className="font-bold text-gray-900">{leave.teacher?.name || leave.student?.name || 'Unknown'}</div>
+                                                <div className="text-xs text-gray-500 font-mono tracking-wide">
+                                                    {leave.applicantRole === 'Teacher' ? 'FAT' : 'STD'} • {leave.teacher?.uid || leave.student?.rollNumber}
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${leave.type === 'Medical' ? 'bg-blue-100 text-blue-700' :

@@ -1,8 +1,9 @@
 require('dotenv').config(); // Loaded environment variables
-const express = require('express');
+const express = require('express'); // Server Trigger
 const mongoose = require('mongoose');
 const cors = require('cors');
 var pathModule = require('path');
+const User = require('./models/User');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -11,16 +12,20 @@ const attendanceRoutes = require('./routes/attendance');
 const analyticsRoutes = require('./routes/analytics');
 const leaveRoutes = require('./routes/leaves');
 const announcementRoutes = require('./routes/announcements');
+const rmsRoutes = require('./routes/rms');
+const notificationRoutes = require('./routes/notifications');
 
 // Initialize Express app
 const app = express();
 
 // Middleware
+const cookieParser = require('cookie-parser');
+const fs = require('fs');
+
+// Middleware
 app.use(cors());
 app.use(express.json());
-
-// Database connection
-const fs = require('fs');
+app.use(cookieParser());
 
 const connectDB = async () => {
     console.log('connectDB called, pathModule is:', typeof pathModule);
@@ -90,9 +95,29 @@ const connectDB = async () => {
     }
 
     mongoose.connect(dbUri)
-        .then(() => {
+        .then(async () => {
             console.log('MongoDB connected successfully');
             console.log('Connected to DB URI:', dbUri);
+
+            // Seed Admin User
+            try {
+                const adminExists = await User.findOne({ uid: 'admin' });
+                if (!adminExists) {
+                    await User.create({
+                        name: 'System Admin',
+                        uid: 'admin',
+                        password: 'password123',
+                        role: 'admin',
+                        email: 'admin@system.com',
+                        department: 'Administration'
+                    });
+                    console.log('✅ Admin user created: uid=admin, password=password123');
+                } else {
+                    console.log('👍 Admin user already exists. Ready for login.');
+                }
+            } catch (seedErr) {
+                console.error('⚠️ Error checking/creating admin user:', seedErr.message);
+            }
         })
         .catch(err => {
             console.error('MongoDB connection error:', err);
@@ -108,6 +133,10 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/leaves', leaveRoutes);
 app.use('/api/announcements', announcementRoutes);
+app.use('/api/rms', rmsRoutes);
+app.use('/api/notifications', notificationRoutes);
+
+// Temporary admin fix route removed
 
 // Basic route for testing
 // app.get('/', (req, res) => {

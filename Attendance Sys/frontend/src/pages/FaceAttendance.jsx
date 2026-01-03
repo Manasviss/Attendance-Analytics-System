@@ -33,7 +33,7 @@ const FaceAttendance = () => {
     const loadLabeledImages = async () => {
         try {
             // Fetch all students with face descriptors
-            const response = await fetch('http://localhost:5000/api/students', {
+            const response = await fetch('/api/students', {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -114,7 +114,7 @@ const FaceAttendance = () => {
 
     const markAttendance = async (studentId) => {
         try {
-            const response = await fetch('http://localhost:5000/api/attendance', {
+            const response = await fetch('/api/attendance', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

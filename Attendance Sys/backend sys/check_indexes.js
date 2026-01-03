@@ -1,21 +1,27 @@
 const mongoose = require('mongoose');
-const User = require('./models/User');
-require('dotenv').config();
+const dotenv = require('dotenv');
+const path = require('path');
 
-const checkIndexes = async () => {
+const envPath = path.join(__dirname, '.env');
+dotenv.config({ path: envPath });
+
+const uri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/attendance_sys';
+console.log('Using Mongo URI:', uri);
+
+const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI);
-        console.log('Connected to MongoDB');
+        const conn = await mongoose.connect(uri);
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
 
-        const indexes = await User.collection.indexes();
-        console.log('Indexes on Users collection:');
-        console.log(JSON.stringify(indexes, null, 2));
+        const indexes = await mongoose.connection.db.collection('attendances').indexes();
+        console.log('Final Indexes on "attendances":');
+        console.log(JSON.stringify(indexes.map(i => i.name), null, 2));
 
         process.exit();
-    } catch (error) {
-        console.error('Error:', error);
+    } catch (err) {
+        console.error(err);
         process.exit(1);
     }
 };
 
-checkIndexes();
+connectDB();

@@ -23,15 +23,15 @@ exports.register = asyncHandler(async (req, res, next) => {
 // @route   POST /api/auth/login
 // @access  Public
 exports.login = asyncHandler(async (req, res, next) => {
-    const { email, password } = req.body;
+    const { uid, password } = req.body;
 
-    // Validate email & password
-    if (!email || !password) {
-        return next(new ErrorResponse('Please provide an email and password', 400));
+    // Validate uid & password
+    if (!uid || !password) {
+        return next(new ErrorResponse('Please provide a UID and password', 400));
     }
 
     // Check for user
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ uid }).select('+password');
 
     if (!user) {
         return next(new ErrorResponse('Invalid credentials', 401));
@@ -39,6 +39,7 @@ exports.login = asyncHandler(async (req, res, next) => {
 
     // Check if password matches
     const isMatch = await user.matchPassword(password);
+
 
     if (!isMatch) {
         return next(new ErrorResponse('Invalid credentials', 401));

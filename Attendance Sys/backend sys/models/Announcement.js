@@ -11,13 +11,17 @@ const announcementSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    image: {
+        type: String,
+        required: false
+    },
     date: {
         type: Date,
         default: Date.now
     },
     category: {
         type: String,
-        enum: ['Academic', 'Event', 'System', 'General', 'Placement', 'Exam'],
+        enum: ['Academic', 'Event', 'System', 'General', 'Placement', 'Exam', 'Admin'],
         default: 'General'
     },
     priority: {

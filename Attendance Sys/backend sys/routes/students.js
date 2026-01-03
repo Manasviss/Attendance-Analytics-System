@@ -8,7 +8,18 @@ const { protect, authorize } = require('../middleware/auth');
 // @access  Private (Teacher/Admin)
 router.get('/', protect, async (req, res) => {
     try {
-        const students = await Student.find();
+        let query = {};
+
+        // Filter by section if provided
+        if (req.query.section) {
+            query.section = req.query.section;
+        }
+        // Filter by class if provided
+        if (req.query.class) {
+            query.class = req.query.class;
+        }
+
+        const students = await Student.find(query).sort({ rollNumber: 1 });
         res.status(200).json({ success: true, count: students.length, data: students });
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });

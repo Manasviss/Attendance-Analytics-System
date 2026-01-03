@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../config';
 
 const AuthContext = createContext();
 
@@ -24,7 +25,7 @@ export function AuthProvider({ children }) {
 
   // Register function
   async function register(name, uid, password, role) {
-    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/register`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -47,7 +48,7 @@ export function AuthProvider({ children }) {
 
   // Login function
   async function login(uid, password) {
-    const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ export function AuthProvider({ children }) {
       }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/me`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -121,6 +122,66 @@ export function AuthProvider({ children }) {
     checkUserLoggedIn();
   }, []);
 
+  // Notifications Logic
+  const [notifications, setNotifications] = useState([]);
+
+  const addNotification = (note) => {
+    setNotifications(prev => [note, ...prev]);
+  };
+
+  // Poll for notifications
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!currentUser) return;
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_BASE_URL}/api/notifications`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          setNotifications(data.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch notifications', err);
+      }
+    };
+
+    if (currentUser) {
+      fetchNotifications(); // Initial fetch
+      const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
+      return () => clearInterval(interval);
+    } else {
+      setNotifications([]);
+    }
+  }, [currentUser]);
+
+  const [showSystemMsg, setShowSystemMsg] = useState(true);
+
+  const markAllRead = async () => {
+    setShowSystemMsg(false);
+    setNotifications([]);
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${API_BASE_URL}/api/notifications`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+    } catch (err) {
+      console.error('Failed to clear notifications', err);
+    }
+  };
+
+  const systemNotification = {
+    _id: 'sys_pinned',
+    title: 'System Update',
+    message: 'Welcome back! The server is running at optimal performance. Remember to submit weekly reports by Friday.',
+    type: 'Info',
+    time: 'Pinned'
+  };
+
+  const finalNotifications = showSystemMsg ? [systemNotification, ...notifications] : notifications;
+
   const value = {
     currentUser,
     register,
@@ -128,7 +189,10 @@ export function AuthProvider({ children }) {
     logout,
     updateUser,
     systemDate,
-    setSystemDate
+    setSystemDate,
+    notifications: finalNotifications,
+    addNotification,
+    markAllRead
   };
 
   return (

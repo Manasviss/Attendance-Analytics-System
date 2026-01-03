@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
+import { API_BASE_URL } from '../config';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -21,11 +22,11 @@ ChartJS.register(
 
 const AttendanceChart = () => {
     const [chartData, setChartData] = useState({
-        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        labels: [],
         datasets: [
             {
                 label: 'Attendance %',
-                data: [0, 0, 0, 0, 0],
+                data: [],
                 backgroundColor: '#00BAF2',
                 borderRadius: 4,
             },
@@ -33,22 +34,41 @@ const AttendanceChart = () => {
     });
 
     useEffect(() => {
-        // In a real app, fetch this from /api/analytics/weekly
-        // For now, we'll simulate dynamic data based on the dashboard stats
-        // or just keep it static until the specific endpoint is built.
-        const mockWeeklyData = [85, 88, 92, 87, 90];
+        const fetchWeeklyStats = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
 
-        setChartData({
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-            datasets: [
-                {
-                    label: 'Attendance %',
-                    data: mockWeeklyData,
-                    backgroundColor: '#00BAF2',
-                    borderRadius: 4,
-                },
-            ],
-        });
+                const response = await fetch(`${API_BASE_URL}/api/analytics/weekly`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const labels = result.data.map(item => item.day);
+                    const data = result.data.map(item => item.percentage);
+
+                    setChartData({
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Attendance %',
+                                data,
+                                backgroundColor: '#00BAF2',
+                                borderRadius: 4,
+                            },
+                        ],
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to fetch weekly stats:', err);
+            }
+        };
+
+        fetchWeeklyStats();
     }, []);
 
     const options = {

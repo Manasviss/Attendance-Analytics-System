@@ -100,4 +100,53 @@ router.get('/dashboard', protect, async (req, res) => {
     }
 });
 
+// @desc    Get weekly attendance stats
+// @route   GET /api/analytics/weekly
+// @access  Private
+router.get('/weekly', protect, async (req, res) => {
+    try {
+        const weeklyStats = [];
+        const today = new Date();
+
+        // Loop back 7 days
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - i);
+
+            const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+            const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+
+            // Get day name (e.g., "Mon")
+            const dayName = startOfDay.toLocaleDateString('en-US', { weekday: 'short' });
+
+            // Count total records for this day
+            const totalRecords = await Attendance.countDocuments({
+                date: { $gte: startOfDay, $lte: endOfDay }
+            });
+
+            if (totalRecords === 0) {
+                weeklyStats.push({ day: dayName, percentage: 0 });
+                continue;
+            }
+
+            // Count present records
+            const presentRecords = await Attendance.countDocuments({
+                date: { $gte: startOfDay, $lte: endOfDay },
+                status: 'Present'
+            });
+
+            const percentage = Math.round((presentRecords / totalRecords) * 100);
+            weeklyStats.push({ day: dayName, percentage });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: weeklyStats
+        });
+    } catch (err) {
+        console.error('Weekly Analytics Error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 module.exports = router;

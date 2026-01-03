@@ -27,7 +27,7 @@ const attendanceSchema = new mongoose.Schema({
     }
 });
 
-// Prevent duplicate attendance for same student on same day
-attendanceSchema.index({ student: 1, date: 1 }, { unique: true });
+// Prevent duplicate attendance for same student on same day and SUBJECT
+attendanceSchema.index({ student: 1, date: 1, subject: 1 }, { unique: true });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);

@@ -5,7 +5,7 @@ const FlowerBackground = () => {
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
             <svg
-                className="absolute -right-20 -top-20 w-96 h-96 opacity-10"
+                className="absolute -right-20 -top-20 w-96 h-96 opacity-30"
                 viewBox="0 0 200 200"
                 xmlns="http://www.w3.org/2000/svg"
             >
@@ -41,7 +41,7 @@ const FlowerBackground = () => {
 
             {/* Bottom Flower/Mandala */}
             <svg
-                className="absolute -left-20 -bottom-20 w-80 h-80 opacity-5"
+                className="absolute -left-20 -bottom-20 w-80 h-80 opacity-40"
                 viewBox="0 0 200 200"
                 xmlns="http://www.w3.org/2000/svg"
             >

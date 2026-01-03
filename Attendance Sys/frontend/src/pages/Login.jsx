@@ -27,13 +27,28 @@ const Login = () => {
     }
   };
 
+  const handleAdminLogin = async () => {
+    try {
+      setError('');
+      setUid('admin');
+      setPassword('password123');
+      setLoading(true);
+      await login('admin', 'password123');
+      navigate('/dashboard');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to log in as admin. Admin account may not exist.');
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-50 to-blue-50">
       {/* Top Gradient Overlay - Subtle RGB-like Mesh */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[100px]" />
-        <div className="absolute top-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/20 blur-[100px]" />
-        <div className="absolute top-[-30%] left-[30%] w-[40%] h-[40%] rounded-full bg-indigo-500/20 blur-[100px]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-500/40 blur-[80px]" />
+        <div className="absolute top-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-400/40 blur-[80px]" />
+        <div className="absolute top-[-30%] left-[30%] w-[40%] h-[40%] rounded-full bg-indigo-400/40 blur-[80px]" />
       </div>
 
       <WaveBackground />
@@ -88,7 +103,7 @@ const Login = () => {
                   value={uid}
                   onChange={(e) => setUid(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3.5 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-[#00BAF2] focus:ring-4 focus:ring-[#00BAF2]/10 transition-all duration-200 text-gray-800 font-medium placeholder-gray-400 bg-gray-50 focus:bg-white"
+                  className="w-full pl-10 pr-4 py-3.5 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-[#00BAF2] focus:ring-4 focus:ring-[#00BAF2]/10 transition-all duration-200 text-gray-800 font-medium placeholder-gray-400 bg-white focus:bg-white"
                   placeholder="Enter your unique ID"
                 />
               </div>
@@ -108,7 +123,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3.5 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-[#00BAF2] focus:ring-4 focus:ring-[#00BAF2]/10 transition-all duration-200 text-gray-800 font-medium placeholder-gray-400 bg-gray-50 focus:bg-white"
+                  className="w-full pl-10 pr-4 py-3.5 rounded-xl border-2 border-gray-200 focus:outline-none focus:border-[#00BAF2] focus:ring-4 focus:ring-[#00BAF2]/10 transition-all duration-200 text-gray-800 font-medium placeholder-gray-400 bg-white focus:bg-white"
                   placeholder="••••••••"
                 />
               </div>
@@ -128,6 +143,15 @@ const Login = () => {
                   Authenticating...
                 </span>
               ) : 'Access Dashboard'}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleAdminLogin}
+              disabled={loading}
+              className="w-full py-4 px-4 bg-white text-[#002E6E] font-bold text-lg rounded-xl shadow-md border-2 border-[#002E6E] hover:bg-blue-50 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              Login as Admin
             </button>
           </form>
 

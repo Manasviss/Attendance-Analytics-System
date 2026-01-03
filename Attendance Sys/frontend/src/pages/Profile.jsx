@@ -35,7 +35,7 @@ const Profile = () => {
                     return;
                 }
 
-                const response = await fetch('http://localhost:5000/api/auth/me', {
+                const response = await fetch('/api/auth/me', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -77,7 +77,7 @@ const Profile = () => {
         setSaveLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/auth/update', {
+            const response = await fetch('/api/auth/update', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ const Profile = () => {
     // 3. Render Loading State
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className="flex items-center justify-center min-h-screen bg-bg-secondary dark:bg-bg-primary">
                 <div className="text-center">
                     <div className="w-12 h-12 border-4 border-[#002E6E] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-gray-500 font-medium">Loading Profile...</p>
@@ -122,7 +122,7 @@ const Profile = () => {
     // 4. Render Error State (if loading done but no profile)
     if (!profile) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className="flex items-center justify-center min-h-screen bg-bg-secondary dark:bg-bg-primary">
                 <div className="text-center">
                     <p className="text-red-500 font-bold mb-4">Failed to load profile data.</p>
                     <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-600 text-white rounded">Retry</button>

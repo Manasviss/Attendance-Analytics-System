@@ -60,9 +60,11 @@ router.get('/my-leaves', protect, async (req, res) => {
     }
 });
 
-// @desc    Update leave status (Approve/Reject)
-// @route   PUT /api/leaves/:id/status
-// @access  Private (Teacher)
+const Notification = require('../models/Notification');
+
+// // @desc    Update leave status (Approve/Reject)
+// // @route   PUT /api/leaves/:id/status
+// // @access  Private (Teacher - actually Admin who is also a user)
 router.put('/:id/status', protect, async (req, res) => {
     try {
         const { status } = req.body;
@@ -82,6 +84,16 @@ router.put('/:id/status', protect, async (req, res) => {
 
         if (!leave) {
             return res.status(404).json({ success: false, error: 'Leave request not found' });
+        }
+
+        // Notify the applicant
+        if (leave.teacher) { // Only notify if it's a teacher's leave
+            await Notification.create({
+                recipient: leave.teacher,
+                title: `Leave request ${status}`,
+                message: `Your leave request for ${new Date(leave.startDate).toLocaleDateString()} has been ${status.toLowerCase()}.`,
+                type: status === 'Approved' ? 'Success' : 'Error' // Error style for rejection
+            });
         }
 
         res.status(200).json({ success: true, data: leave });

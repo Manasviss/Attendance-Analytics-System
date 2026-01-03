@@ -85,7 +85,7 @@ const RegisterFace = () => {
                 const descriptor = Array.from(detections.descriptor);
 
                 // Send to backend
-                const response = await fetch(`http://localhost:5000/api/students/${studentId}/face`, {
+                const response = await fetch(`/api/students/${studentId}/face`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

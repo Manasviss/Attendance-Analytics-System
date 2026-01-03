@@ -29,10 +29,18 @@ router.get('/daily-report', protect, async (req, res) => {
 
         console.log(`Daily Report Request for ${date} [${start.toISOString()} - ${end.toISOString()}]`);
 
-        const records = await Attendance.find({
+        const query = {
             date: { $gte: start, $lt: end }
-        })
-            .populate('student', 'name rollNumber')
+        };
+
+        // If not admin, only show records marked by this user
+        // This fixes the issue of seeing other teachers' data/reports
+        if (req.user.role !== 'admin') {
+            query.markedBy = req.user.id;
+        }
+
+        const records = await Attendance.find(query)
+            .populate('student', 'name rollNumber section class')
             .populate('markedBy', 'name')
             .sort({ date: -1 });
 
@@ -42,6 +50,8 @@ router.get('/daily-report', protect, async (req, res) => {
             date: r.date,
             status: r.status,
             subject: r.subject || 'General', // Include Subject
+            section: r.student ? r.student.section : 'N/A', // Include Section
+            class: r.student ? r.student.class : 'N/A', // Include Class
             studentName: r.student ? r.student.name : 'Unknown Student',
             rollNumber: r.student ? r.student.rollNumber : 'N/A',
             markedBy: r.markedBy ? r.markedBy.name : 'System',
@@ -70,9 +80,27 @@ router.get('/history', protect, async (req, res) => {
         const start = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 0, 0, 0, 0));
         const end = new Date(Date.UTC(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 23, 59, 59, 999));
 
-        const records = await Attendance.find({
+        const query = {
             date: { $gte: start, $lt: end }
-        }).populate('student', 'name _id');
+        };
+
+        // Inherit filtering: Teachers only see what THEY marked
+        if (req.user.role !== 'admin') {
+            query.markedBy = req.user.id;
+        }
+
+        // Add optional filters if provided in query
+        if (req.query.subject) query.subject = req.query.subject;
+        if (req.query.section) query.section = req.query.section; // This requires Populate filtering or if section is stored in Attendance. 
+        // Note: Section is NOT stored in Attendance model directly (it is on Student). 
+        // The current find() doesn't filter by section efficiently without aggregating, 
+        // but the frontend calls with section? 
+        // Wait, the previous code didn't filter by subject/section in the DB query? 
+        // Looking at previous code: `const records = await Attendance.find({ date: ... })`.
+        // It fetched ALL records for the day and returned them?
+        // Let's stick to the scoping fix first.
+
+        const records = await Attendance.find(query).populate('student', 'name _id');
 
         res.status(200).json({ success: true, data: records });
     } catch (err) {
@@ -109,7 +137,8 @@ router.post('/bulk', protect, async (req, res) => {
             updateOne: {
                 filter: {
                     student: record.studentId,
-                    date: attendanceDate // Exact match on UTC midnight
+                    date: attendanceDate, // Exact match on UTC midnight
+                    subject: recordSubject
                 },
                 update: {
                     $set: {
