@@ -19,8 +19,24 @@
             "destination": "/backend sys/server.js"
         },
         {
+            "source": "/assets/(.*)",
+            "destination": "/frontend/assets/$1"
+        },
+        {
+            "source": "/models/(.*)",
+            "destination": "/frontend/models/$1"
+        },
+        {
+            "source": "/videos/(.*)",
+            "destination": "/frontend/videos/$1"
+        },
+        {
+            "source": "/vite.svg",
+            "destination": "/frontend/vite.svg"
+        },
+        {
             "source": "/(.*)",
-            "destination": "/frontend/dist/index.html"
+            "destination": "/frontend/index.html"
         }
     ]
 }
